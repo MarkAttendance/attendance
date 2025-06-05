@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance Tracker</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://images.unsplash.com/photo-1588776814546-ec7a3a8b5b4e') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.6);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      max-width: 500px;
+      width: 100%;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      margin-top: 10px;
+      display: block;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="container">
+      <h2>Attendance Form</h2>
+
+      <label for="name">Enter Name (max 100 characters):</label>
+      <input type="text" id="name" maxlength="100" placeholder="Enter your name" required>
+
+      <label for="date">Select Date:</label>
+      <input type="date" id="date" required>
+
+      <label for="location">Select Working Location:</label>
+      <select id="location" onchange="checkOtherLocation()">
+        <option value="" disabled selected>Select location</option>
+        <option>Airoli</option>
+        <option>KM</option>
+        <option>Jogeshwari</option>
+        <option>MIDC</option>
+        <option>WFH</option>
+        <option>Pune</option>
+        <option>Bank House</option>
+        <option>Others</option>
+      </select>
+
+      <input type="text" id="otherLocation" class="hidden" placeholder="Enter other location">
+
+      <button onclick="markAttendance()">Submit Attendance</button>
+      <button onclick="downloadExcel()">Download Attendance Excel</button>
+    </div>
+  </div>
+
+  <script>
+    let attendanceData = [];
+
+    function checkOtherLocation() {
+      const location = document.getElementById('location').value;
+      const otherInput = document.getElementById('otherLocation');
+      otherInput.classList.toggle('hidden', location !== 'Others');
+      if (location !== 'Others') otherInput.value = '';
+    }
+
+    function markAttendance() {
+      const name = document.getElementById('name').value.trim();
+      const date = document.getElementById('date').value;
+      const location = document.getElementById('location').value;
+      const otherLocation = document.getElementById('otherLocation').value.trim();
+
+      if (!name || !location || !date || (location === 'Others' && !otherLocation)) {
+        alert("Please complete all fields.");
+        return;
+      }
+
+      const finalLocation = location === 'Others' ? otherLocation : location;
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+
+      attendanceData.push({ Name: name, Date: date, Location: finalLocation, Time: time });
+
+      alert("Attendance recorded successfully!");
+      document.getElementById('name').value = '';
+      document.getElementById('date').value = '';
+      document.getElementById('location').selectedIndex = 0;
+      document.getElementById('otherLocation').classList.add('hidden');
+      document.getElementById('otherLocation').value = '';
+    }
+
+    function downloadExcel() {
+      if (attendanceData.length === 0) {
+        alert("No attendance records available.");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(attendanceData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
+
+      XLSX.writeFile(workbook, "Attendance.xlsx");
+    }
+  </script>
+</body>
+</html>
