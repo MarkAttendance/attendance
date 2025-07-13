@@ -89,7 +89,7 @@
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbx52CsTBdh0ciSwe-8PZS-Dlz5boRucCeS2x-av5NIF/dev";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyJ69yAm46FdHH2TsQkQ02DmO4oTrtQCQDhq2z217NUrvOG0-lrWssgqxwYjLgr2pc4Yw/exec";
 
     function checkOtherLocation() {
       const location = document.getElementById('location').value;
@@ -113,27 +113,24 @@
 
       fetch(scriptURL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        mode: "no-cors",  // <-- Important for GitHub Pages or external hosting
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           name: name,
           date: date,
           location: finalLocation,
           time: time
         })
-      })
-      .then(res => {
-        if (res.ok) {
-          alert("Attendance submitted successfully!");
-          document.getElementById('name').value = '';
-          document.getElementById('date').value = '';
-          document.getElementById('location').selectedIndex = 0;
-          document.getElementById('otherLocation').value = '';
-          document.getElementById('otherLocation').classList.add('hidden');
-        } else {
-          alert("Failed to submit. Please try again.");
-        }
-      })
-      .catch(err => alert("Error: " + err.message));
+      });
+
+      alert("Attendance submitted! Check your Google Sheet shortly.");
+      document.getElementById('name').value = '';
+      document.getElementById('date').value = '';
+      document.getElementById('location').selectedIndex = 0;
+      document.getElementById('otherLocation').value = '';
+      document.getElementById('otherLocation').classList.add('hidden');
     }
   </script>
 </body>
